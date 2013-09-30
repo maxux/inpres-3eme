@@ -1,0 +1,37 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Petra Remote Control</title>
+	<link rel="stylesheet" href="style.css" media="all" type="text/css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="petraremote.js"></script>
+	<script type="text/javascript">
+	var petraremote;
+
+	$(document).ready(function() {
+		petraremote = new PetraRemote();
+	});
+	</script>
+</head>
+
+<body>
+	<section>
+		<div id="data">
+			<h1>Capteurs</h1>
+			<div id="sensors">
+				
+			</div>
+			
+			<h1>Activateurs</h1>
+			<div id="actuators">
+				
+			</div>
+		</div>
+		
+		<h1>Information</h1>
+		<div id="status">
+			Connexion au serveur en cours
+		</div>
+	</section>
+</body>
+</html>

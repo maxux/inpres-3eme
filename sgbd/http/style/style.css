@@ -1,0 +1,71 @@
+body {
+	background: rgb(226,215,215); /* Old browsers */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNzUlIj4KICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiNlMmQ3ZDciIHN0b3Atb3BhY2l0eT0iMSIvPgogICAgPHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjZmZmZmZmIiBzdG9wLW9wYWNpdHk9IjEiLz4KICA8L3JhZGlhbEdyYWRpZW50PgogIDxyZWN0IHg9Ii01MCIgeT0iLTUwIiB3aWR0aD0iMTAxIiBoZWlnaHQ9IjEwMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-radial-gradient(center, ellipse cover, rgba(226,215,215,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(226,215,215,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover, rgba(226,215,215,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover, rgba(226,215,215,1) 0%,rgba(255,255,255,1) 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover, rgba(226,215,215,1) 0%,rgba(255,255,255,1) 100%); /* IE10+ */
+	background: radial-gradient(ellipse at center, rgba(226,215,215,1) 0%,rgba(255,255,255,1) 100%); /* W3C */
+	margin: 0;
+	height: 100%;
+	font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+div#container {
+	width: 85%;
+	box-shadow: 0 0 15px #1A1A1A;
+	margin: auto;
+	min-height: 100%;
+	padding-top: 10px;
+}
+
+h1 {
+	text-align: center;
+	color: #1A2632;
+	text-shadow: 0 0 15px #E5E5E5;
+}
+
+section {
+	width: 95%;
+	margin: 0 auto 25px auto;
+	padding: 10px;
+	border: solid 1px #4D4D4D;
+}
+
+h2 {
+	padding: 0 0 0 25px;
+	border-bottom: dashed 1px #1A1A1A;
+	margin: 0 0 15px 0;
+	font-size: 16px;
+	color: #4D4D4D;
+}
+
+input {
+	border: solid 1px #32424F;
+	width: 300px;
+}
+
+input.small {
+	width: 100px;
+	text-align: center;
+}
+
+input.date {
+	width: 100px;
+	text-align: center;
+}
+
+label {
+	width: 140px;
+	display: block;
+	float: left;
+}
+
+button {
+	float: right;
+}
+
+.clear {
+	clear: both;
+}
