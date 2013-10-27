@@ -30,4 +30,8 @@ app.post('/rechci', function(req, res) {
 	rechci.parse(res, req.body);
 });
 
+app.get('/rechci', function(req, res) {
+	rechci.preview(res, req);
+});
+
 app.listen(8080);

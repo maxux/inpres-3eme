@@ -1,0 +1,44 @@
+//
+// Rennequinepolis
+// Static web pages server, used for web-ui
+//
+// Author: Daniel Maxime, 2326
+// 
+
+var express = require('./modules/express');
+
+//
+// load interfaces
+//
+var RechCI = require('./polis-rechci.js');
+rechci = new RechCI('./db/cache.sqlite3');
+
+var AlimCB = require('./polis-alimcb.js');
+alimcb = new AlimCB('./db/cache.sqlite3');
+
+//
+// provides a more complexe web server
+// which parse the query and reply from cache database
+// and give a static file access to http folder
+//
+var app = express();
+
+// static contents
+app.use(express.static('./http'));
+
+// dynamic contents
+app.use(express.bodyParser());
+
+app.post('/rechci', function(req, res) {
+	rechci.parse(res, req.body);
+});
+
+app.get('/rechci', function(req, res) {
+	rechci.preview(res, req);
+});
+
+app.post('/alimcb', function(req, res) {
+	alimcb.parse(res, req.body);
+});
+
+app.listen(8080);

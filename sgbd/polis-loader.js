@@ -8,9 +8,6 @@
 // loading required libraries
 var fs = require('fs');
 
-// FIXME
-fs.unlinkSync('./db/cache.sqlite3');
-
 // opening sqlite 
 if(!fs.existsSync('./db/cache.sqlite3')) {
 	console.log('[+] core: database not found');

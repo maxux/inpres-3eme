@@ -8,16 +8,27 @@
 var util = require('util');
 var events = require('events');
 var sqlite3 = require('./modules/sqlite3').verbose();
+var MaxuxCouchDB = require('./modules/maxux-couch/maxux-couch');
 
 var RechCI = function(db_file) {
 	var db = new sqlite3.Database(db_file);
 	events.EventEmitter.call(this);
 	
-	this.tableappend = function(table, from, where) {
-		from.push(table);
-		where.push(table + '.id = t.id');
+	var couch_host = '10.142.1.2';
+	var couch_port = 5984;
+	var baseurl = '/movies/';
+	
+	this.tableappend = function(table, from, where, indice) {
+		// alias with indice appended if set
+		if(indice != undefined)
+			var temp = table + indice;
+		else
+			var temp = table;
 		
-		return table;
+		from.push(table + ' ' + temp);
+		where.push(temp + '.id = t.id');
+		
+		return temp;
 	};
 	
 	this.search = function(fields, response, root) {
@@ -29,21 +40,38 @@ var RechCI = function(db_file) {
 		var where = new Array();
 		var args  = {};
 		
+		if(fields.id != undefined) {
+			where.push('t.id = $id');
+			args.$id = fields.id;
+		}
+		
 		if(fields.title != undefined) {
 			where.push('t.key LIKE $title');
 			args.$title = '%' + fields.title + '%';
 		}
 		
 		if(fields.actor != undefined) {
-			var alias = root.tableappend('actors_name', from, where);
-			where.push(alias + '.key LIKE $actor');
-			args.$actor = '%' + fields.actor + '%';
+			// split different actors
+			var list = fields.actor.split(',');
+			
+			// iterate on each actors
+			for(var i = 0; i < list.length; i++) {
+				var alias = root.tableappend('actors_name', from, where, i);
+				where.push(alias + '.key LIKE $actor' + i);
+				
+				// affecting variable value and trim spaces
+				eval('args.$actor' + i + ' = \'%' + list[i].trim() + '%\';');
+			}
 		}
 		
 		if(fields.director != undefined) {
-			var alias = root.tableappend('directors_name', from, where);
-			where.push(alias + '.key LIKE $director');
-			args.$director = '%' +  fields.director + '%';
+			var list = fields.director.split(',');
+			
+			for(var i = 0; i < list.length; i++) {
+				var alias = root.tableappend('directors_name', from, where, i);
+				where.push(alias + '.key LIKE $director' + i);				
+				eval('args.$director' + i + ' = \'%' + list[i].trim() + '%\';');
+			}
 		}
 		
 		if(fields.genre != undefined) {
@@ -73,7 +101,7 @@ var RechCI = function(db_file) {
 				fields.vote_min = 0;
 			
 			if(fields.vote_max == undefined || isNaN(parseFloat(fields.vote_max)))
-				fields.vote_max = 9999999999;
+				fields.vote_max = 9999999999; // Luuuulz
 			
 			// skip if full range
 			if(fields.vote_min != 0 || fields.vote_max != 9999999999) {
@@ -84,13 +112,30 @@ var RechCI = function(db_file) {
 			}
 		}
 		
+		if(fields.release_min != undefined || fields.release_max != undefined) {
+			if(fields.release_min == undefined || isNaN(parseFloat(fields.release_min)))
+				fields.release_min = '1000-01-01';
+			
+			if(fields.release_max == undefined || isNaN(parseFloat(fields.release_max)))
+				fields.vote_max = '3000-01-01'; // Luuuulz
+			
+			// skip if full range
+			if(fields.vote_min != '1000-01-01' || fields.vote_max != '3000-01-01') {
+				var alias = root.tableappend('release_date', from, where);
+				where.push(alias + '.key >= $release_min AND ' + alias + '.key <= $release_max');
+				
+				args.$release_min = fields.release_min;
+				args.$release_max = fields.release_max;
+			}
+		}
+		
 		//
 		// DATE: load it at boot from sql
 		//
 		
 		
 		var sqlquery = "SELECT t.id, t.key FROM " + from.join(', ') + 
-		               " WHERE " + where.join(' AND ') + " LIMIT 10";
+		               " WHERE " + where.join(' AND ') + " LIMIT 50";
 		 
 		console.log(sqlquery);
 		console.log(args);
@@ -100,12 +145,10 @@ var RechCI = function(db_file) {
 			sqlquery,
 			args,
 			function(err, rows) {
-				// console.log(rows);
+				if(rows == undefined)
+					rows = [];
 				
-				if(rows != undefined)
-					calling.emit('got-results', response, rows);
-					
-				else calling.emit('got-results', response, []);
+				calling.emit('got-results', response, rows);
 			}
 		);
 		
@@ -125,6 +168,22 @@ var RechCI = function(db_file) {
 			
 			response.set({'Content-Type': 'application/json'});
 			response.send(JSON.stringify(items));
+		});
+	};
+	
+	this.preview = function(response, request) {
+		response.set({'Content-Type': 'application/json'});
+		
+		if(request.query.id == undefined) {
+			response.send(JSON.stringify({error: 'invalid id'}));
+			return;
+		}
+		
+		var couch = new MaxuxCouchDB(couch_host, couch_port);
+		
+		console.log('[+] preview: processing: ' + request.query.id);
+		couch.request(baseurl + request.query.id).on('json', function(json) {
+			response.send(JSON.stringify(json));
 		});
 	};
 	

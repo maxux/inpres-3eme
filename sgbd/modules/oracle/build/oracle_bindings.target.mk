@@ -107,7 +107,7 @@ LIBS := \
 	-locci \
 	-lclntsh \
 	-lnnz11 \
-	-L/usr/lib/oracle/11.2.0.3/client/lib64
+	-L/usr/lib64/oracle/11.2.0.3/client/lib64/
 
 $(obj).target/oracle_bindings.node: GYP_LDFLAGS := $(LDFLAGS_$(BUILDTYPE))
 $(obj).target/oracle_bindings.node: LIBS := $(LIBS)

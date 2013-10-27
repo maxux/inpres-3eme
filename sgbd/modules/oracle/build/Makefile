@@ -316,8 +316,8 @@ ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
 endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
-cmd_regen_makefile = /usr/lib64/node_modules/npm/node_modules/node-gyp/gyp/gyp -fmake --ignore-environment "--toplevel-dir=." -I/home/maxux/node_modules/oracle/build/config.gypi -I/usr/lib64/node_modules/npm/node_modules/node-gyp/addon.gypi -I/root/.node-gyp/0.10.18/common.gypi "--depth=." "-Goutput_dir=." "--generator-output=build" "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/root/.node-gyp/0.10.18" "-Dmodule_root_dir=/home/maxux/node_modules/oracle" binding.gyp
-Makefile: $(srcdir)/../../../../usr/lib64/node_modules/npm/node_modules/node-gyp/addon.gypi $(srcdir)/../../../../root/.node-gyp/0.10.18/common.gypi $(srcdir)/build/config.gypi $(srcdir)/binding.gyp
+cmd_regen_makefile = /usr/lib64/node_modules/node-gyp/gyp/gyp -fmake --ignore-environment "--toplevel-dir=." -I/home/maxux/git-sources/inpres-3eme/sgbd/modules/oracle/build/config.gypi -I/usr/lib64/node_modules/node-gyp/addon.gypi -I/root/.node-gyp/0.10.18/common.gypi "--depth=." "-Goutput_dir=." "--generator-output=build" "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/root/.node-gyp/0.10.18" "-Dmodule_root_dir=/home/maxux/git-sources/inpres-3eme/sgbd/modules/oracle" binding.gyp
+Makefile: $(srcdir)/../../../../../../../usr/lib64/node_modules/node-gyp/addon.gypi $(srcdir)/../../../../../../../root/.node-gyp/0.10.18/common.gypi $(srcdir)/build/config.gypi $(srcdir)/binding.gyp
 	$(call do_cmd,regen_makefile)
 
 # "all" is a concatenation of the "all" targets from all the included
