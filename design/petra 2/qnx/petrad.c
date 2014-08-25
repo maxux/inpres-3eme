@@ -68,13 +68,14 @@ void dump_actuators(actuator_t *actuators) {
 
 void send_sensors(thread_data_t *data) {
 	char buffer[1024];
+	int offset;
 	
 	//
 	// building JSON pseudo-array
 	// this is not beautiful but faster than create a true JSON object
 	//
-	snprintf(buffer, sizeof(buffer),
-	         "[%d,%d,%d,%d,%d,%d,%d,%d]\n",
+	offset = snprintf(buffer, sizeof(buffer),
+	         "[[%d,%d,%d,%d,%d,%d,%d,%d],",
 	         data->sensors.L1,
 	         data->sensors.L2,
 	         data->sensors.T,
@@ -83,6 +84,17 @@ void send_sensors(thread_data_t *data) {
 	         data->sensors.AP,
 	         data->sensors.PP,
 	         data->sensors.DE
+	);
+	
+	snprintf(buffer + offset, sizeof(buffer) - offset,
+	         "[%d,%d,%d,%d,%d,%d,%d]]\n",
+	         data->actuators.CP,
+	         data->actuators.C1,
+	         data->actuators.C2,
+	         data->actuators.PV,
+	         data->actuators.PA,
+	         data->actuators.AA,
+	         data->actuators.GA
 	);
 	
 	if(send(data->sockfd, buffer, strlen(buffer), 0) < 0)
@@ -99,7 +111,6 @@ void *thread_sensors(void *_data) {
 	int fd;
 	
 	if((fd = open(SENSORS_FILENAME, O_RDONLY)) < 0)
-	// if((fd = open("/tmp/petra", O_RDONLY)) < 0)
 		diep("[-] sensors: open: " SENSORS_FILENAME);
 	
 	//
@@ -111,7 +122,7 @@ void *thread_sensors(void *_data) {
 	//
 	// initial read and send
 	//
-	if(read(fd, &data->sensors, 1) != 1)
+	if(read(fd, &data->sensors, sizeof(sensor_t)) != sizeof(sensor_t))
 		perror("[-] sensors: read");
 	
 	send_sensors(data);
@@ -123,7 +134,7 @@ void *thread_sensors(void *_data) {
 	while(1) {
 		lseek(fd, 0, SEEK_SET);
 		
-		if(read(fd, &data->sensors, 1) != 1)
+		if(read(fd, &data->sensors, sizeof(sensor_t)) != sizeof(sensor_t))
 			perror("[-] sensors: read");
 		
 		//
@@ -138,6 +149,8 @@ void *thread_sensors(void *_data) {
 		previous = data->sensors;
 		usleep(100000);
 	}
+	
+	close(fd);
 	
 	return data;
 }
@@ -174,11 +187,10 @@ int parse(char *buffer, thread_data_t *data, int fd) {
 	printf("[+] set <%s> to <%d>\n", key, value);
 	
 	//
-	// open actuators file and read it once
-	// then updating it
+	// reading current actuators state
 	//
-	
-	if(read(fd, &data->actuators, 1) != 1)
+	lseek(fd, SEEK_SET, 0);
+	if(read(fd, &data->actuators, sizeof(actuator_t)) != sizeof(actuator_t))
 		perror("[-] actuators: read");
 	
 	dump_actuators(&data->actuators);
@@ -213,7 +225,7 @@ int parse(char *buffer, thread_data_t *data, int fd) {
 	// rollback to the beginin and writing new values
 	//
 	lseek(fd, SEEK_SET, 0);
-	if(write(fd, &data->actuators, 1) != 1)
+	if(write(fd, &data->actuators, sizeof(actuator_t)) != sizeof(actuator_t))
 		perror("[-] actuators: write");
 		
 	return 0;
@@ -225,13 +237,36 @@ int parse(char *buffer, thread_data_t *data, int fd) {
 //
 void *thread_actuators(void *_data) {
 	thread_data_t *data = (thread_data_t *) _data;
+	actuator_t previous;
 	char buffer[1024];
 	ssize_t length;
 	int fd;
 	
+	//
+	// opening actuators, this lock the device
+	//
 	if((fd = open(ACTUATORS_FILENAME, O_RDWR)) < 0)
-	// if((fd = open("/tmp/petra1", O_RDWR)) < 0)
 		diep("[-] actuators: open: " ACTUATORS_FILENAME);
+	
+	//
+	// initializing actuators variable
+	//
+	bzero(&data->actuators, sizeof(actuator_t));
+	bzero(&previous, sizeof(actuator_t));
+	
+	//
+	// initial real read
+	//
+	if(read(fd, &data->actuators, sizeof(actuator_t)) != sizeof(actuator_t))
+		perror("[-] actuators: read");
+	
+	// printf("%u\n", sizeof(actuator_t));
+	
+	//
+	// sending actuators, a first time
+	//
+	dump_actuators(&data->actuators);
+	send_sensors(data);
 	
 	while(1) {
 		if((length = recv(data->sockfd, buffer, sizeof(buffer), 0)) < 0)
@@ -250,7 +285,20 @@ void *thread_actuators(void *_data) {
 		//
 		printf("[+] actuators: request: %s\n", buffer);
 		parse(buffer, data, fd);
+		
+		//
+		// actuators changed from last time
+		//
+		if(memcmp(&data->actuators, &previous, sizeof(actuator_t))) {
+			printf("[+] actuators: update detected\n");
+			dump_actuators(&data->actuators);
+			send_sensors(data);
+		}
+		
+		previous = data->actuators;
 	}
+	
+	close(fd);
 	
 	return data;
 }

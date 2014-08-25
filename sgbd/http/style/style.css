@@ -125,3 +125,132 @@ table tr td span {
 	top: 0;
 	transition: 3s;
 }
+
+#movies {
+	width: 750px;
+	margin: auto;
+}
+
+#movies ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 750px;
+}
+
+#movies ul li {
+	margin: 0;
+	padding: 0;
+	float: left;
+	width: 200px;
+	margin: 20px;
+	opacity: 0.7;
+	/* transition: 0.3s; */
+	height: 384px;
+	cursor: hand;
+}
+
+#movies ul li:hover {
+	opacity: 1;
+}
+
+#movies h3 {
+	font-size: 24px;
+	text-align: center;
+}
+
+div.image { 
+	position: relative; 
+	width: 100%; /* for IE 6 */
+}
+
+div.image h4 {
+	position: absolute;
+	top: 0; 
+	left: 0; 
+	width: 100%;
+}
+
+div.image h4 span {
+	color: white; 
+	background: rgb(0, 0, 0); /* fallback color */
+	background: rgba(0, 0, 0, 0.7);
+	padding: 0px 15px 0px 10px;
+}
+
+#moreinfo a:link, #moreinfo a:visited {
+	color: #000000;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.pages {
+	padding: 5px 20px 5px 20px;
+	margin-bottom: 15px;
+	border: dashed 1px #008000;
+}
+
+div.caddie {
+	position: absolute;
+	top: 0;
+	left: 72%;
+	border: solid 1px #E2B565;
+	border-top: none;
+	box-shadow: 0 0 15px #1A1A1A;
+	width: 150px;
+	height: 30px;
+	background-color: #FADCA6;
+	line-height: 30px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.caddie a:link, .caddie a:active, .caddie a:visited {
+	text-decoration: none;
+	color: #4D4D4D;
+}
+
+.caddie a:hover {
+	text-decoration: underline;
+}
+
+#progra input {
+	width: 40px;
+	display: inline;
+	float: none;
+}
+
+#progra button {
+	float: none;
+}
+
+ul.caddie-list {
+	width: 600px;
+}
+
+ul.caddie-list li {
+	margin-bottom: 10px;
+	transition: 1s;
+}
+
+ul.caddie-list li:hover {
+	background-color: #ADD8E6;
+}
+
+.free {
+	color: #008000;
+}
+
+.warning {
+	color: #BB7900;
+}
+
+.full {
+	color: #A52A2A;
+}
+
+#current-caddie span {
+	text-align: center;
+	font-weight: bold;
+	display: block;
+}

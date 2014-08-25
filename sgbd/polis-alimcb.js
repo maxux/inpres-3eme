@@ -5,11 +5,12 @@
 // Author: Daniel Maxime, 2326
 // 
 
-var util = require('util');
-var events = require('events');
+var util    = require('util');
+var events  = require('events');
 var sqlite3 = require('./modules/sqlite3').verbose();
 var MaxuxCouchDB = require('./modules/maxux-couch/maxux-couch');
-var oracle = require("./modules/oracle");
+var oracle  = require("./modules/oracle");
+var http    = require('http');
 
 var AlimCB = function(db_file) {
 	var db = new sqlite3.Database(db_file);
@@ -20,10 +21,9 @@ var AlimCB = function(db_file) {
 	var baseurl    = '/movies/';
 	var self       = this;
 	
-	this.def_mean   = 7.5;
-	this.def_stddev = 2;
-	
-	var picture_base = 'http://cf2.imgobject.com/t/p/' + 'w185/';
+	this.def_mean     = 7.5;
+	this.def_stddev   = 2;
+	this.picture_base = 'http://cf2.imgobject.com/t/p/' + 'w185/';
 	
 	var oradata = {
 		'hostname': '10.142.1.101',
@@ -47,62 +47,151 @@ var AlimCB = function(db_file) {
 	// this should be done for each movie to transfert
 	//
 	this.process = function(movie, calling, root) {
-		console.log(movie);
+		var self      = this;
 		
-		var artists = new Array();
+		var actors    = new Array();
+		var directors = new Array();
+		var genres    = new Array();
+		var companies = new Array();
+		var languages = new Array();
+		
+		this._movie = movie;
+		
+		if(movie.data.poster_path != null)
+			this._path  = root.picture_base + movie.data.poster_path;
+			
+		else this._path = null;
+		
 		var args    = [
+			movie.data._id,
 			movie.data.title,
 			movie.data.vote_average,
 			movie.data.vote_count,
 			movie.count,
 			movie.data.overview,
 			null,
-			new Date(movie.data.release_date),
+			(movie.data.release_date != "") ? new Date(movie.data.release_date) : null,
 			(movie.data.certification == undefined) ? null : movie.data.certification,
 			movie.data.runtime,
 		];
 		
-		var stuff = 
-			"DECLARE                         " +
-			" m movies%rowtype;              " +
-			" s artists_t;                   " +
-			"BEGIN                           " +
-			"  m.title := :1;                " +
-			"  m.vote_average := :2;         " +
-			"  m.vote_count := :3;           " +
-			"  m.nb_copies := :4;            " +
-			"  m.overview := :5;             " +
-			"  m.rating := :6;               " +
-			"  m.released_date := :7;        " +
-			"  m.certification := :8;        " +
-			"  m.runtime := :9;              " +
-			"  m.production_country := :10;  ";
-			;
-		
 		if(movie.data.production_countries.length > 0)
-			args[9] = movie.data.production_countries[0].iso_3166_1;
+			args[10] = movie.data.production_countries[0].iso_3166_1;
 			
-		else args[9] = null;
+		else args[10] = null;
 		
+		var argind = 12;
+		//
+		// actors
+		//
 		for(var i = 0; i < movie.data.actors.length; i++) {
-			artists.push(':' + (i + 11));
-			args[i + 10] = movie.data.actors[i].name;
+			actors.push(':' + (argind));
+			args[argind++ - 1] = movie.data.actors[i].name;
 		}
 		
-		stuff += 
-			"  s := artists_t(" + artists.join(',') + "); ";
+		//
+		// directors
+		//
+		for(var i = 0; i < movie.data.directors.length; i++) {
+			directors.push(':' + (argind));
+			args[argind++ - 1] = movie.data.directors[i].name;
+		}
 		
-		stuff += 
-			"  SGBDCB.AlimCB(m, s);          " +
+		//
+		// genres
+		//
+		for(var i = 0; i < movie.data.genres.length; i++) {
+			genres.push(':' + (argind));
+			args[argind++ - 1] = movie.data.genres[i].name;
+		}
+		
+		//
+		// companies
+		//
+		for(var i = 0; i < movie.data.production_companies.length; i++) {
+			companies.push(':' + (argind));
+			args[argind++ - 1] = movie.data.production_companies[i].name;
+		}
+		
+		//
+		// languages
+		//
+		for(var i = 0; i < movie.data.spoken_languages.length; i++) {
+			languages.push(':' + (argind));
+			args[argind++ - 1] = movie.data.spoken_languages[i].iso_639_1.toUpperCase();
+		}
+		
+		var stuff = 
+			"DECLARE                         \n" +
+			"  m movies%rowtype;             \n" +
+			"  x_a artists_t;                \n" +
+			"  x_d artists_t;                \n" +
+			"  x_g genres_t;                 \n" +
+			"  x_c companies_t;              \n" +
+			"  x_l langs_t;                  \n" +
+			"BEGIN                           \n" +
+			"  m.id := :1;                   \n" +
+			"  m.title := :2;                \n" +
+			"  m.vote_average := :3;         \n" +
+			"  m.vote_count := :4;           \n" +
+			"  m.nb_copies := :5;            \n" +
+			"  m.overview := :6;             \n" +
+			"  m.rating := :7;               \n" +
+			"  m.released_date := :8;        \n" +
+			"  m.certification := :9;        \n" +
+			"  m.runtime := :10;             \n" +
+			"  m.production_country := :11;  \n" +
+			"  x_a := artists_t(" + actors.join(',')    + "); \n" +
+			"  x_d := artists_t(" + directors.join(',') + "); \n" +
+			"  x_g := genres_t("  + genres.join(',')    + "); \n" +
+			"  x_c := companies_t(" + companies.join(',') + "); \n" +
+			"  x_l := langs_t("  + languages.join(',') + "); \n" +
+			"  SGBDCB.AlimCB(m, x_a, x_d, x_g, x_c, x_l); \n" + 
 			"END;                            ";
-		
+			
 		console.log(stuff);
 		console.log(args);
 		
 		root.connection.execute(stuff, args, function(err, results) {
-			console.log(err);
-			console.log(results);
+			if(err != undefined) {
+				console.log(err);
+				calling.emit('download-finished');
+				return;
+			}
+			
+			console.log(results);				
+			
+			if(self._path == null) {
+				console.log("[-] no poster found, skipping");
+				calling.emit('download-finished');
+				return;
+			}
+			
+			var options = {
+				host: '10.142.1.103',
+				port: 80,
+				path: 'blob.php?image=' + self._path + '&movie=' + self._movie.data._id
+			};
+			
+			console.log(options);
+			
+			var req = http.request(options, function(resp) {
+				resp.on('data', function(chunk) {
+					console.log('[+] download finished: ' + chunk);
+					calling.emit('download-finished');
+				});
+				
+			});
+			
+			req.on('error', function(e) {
+				console.log("[-] request: " + e.message);
+				calling.emit('download-finished');
+			});
+
+			req.end();
 		});
+		
+		console.log("[+] waiting response from Oracle database");
 	};
 	
 	this.alim = function(fields, response, root) {
@@ -126,7 +215,7 @@ var AlimCB = function(db_file) {
 					opts.root.movies[opts.index].data = json;
 					
 					// calling database processing
-					opts.parent.process(opts.root.movies[opts.index], calling, opts.parent);
+					new opts.parent.process(opts.root.movies[opts.index], calling, opts.parent);
 				}
 			);
 		}
@@ -142,9 +231,7 @@ var AlimCB = function(db_file) {
 		//
 		// fired when everything is done, returning data to client
 		//
-		calling.on('download-finished', function(movies) {
-			console.log(movies);
-			
+		calling.on('download-finished', function(movies) {			
 			// processing
 			calling.emit('got-results', response, self.movies);
 		});
@@ -161,10 +248,8 @@ var AlimCB = function(db_file) {
 		var handler = new this.alim(query, response, this);
 		
 		handler.on('got-results', function(response, items) {
-			console.log(items);
-			
-			response.set({'Content-Type': 'application/json'});
-			response.send(JSON.stringify(items));
+			// response.set({'Content-Type': 'text/html'});
+			response.send("<pre>Commande: " + items.length + " film(s) commandé(s)</pre>");
 		});
 	};
 	

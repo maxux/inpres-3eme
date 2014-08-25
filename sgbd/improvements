@@ -1,0 +1,11 @@
+- AlimCB: * procédure Logger ajouté en pragma
+          * un seul commit dans l'insertion
+          
+
+- ProgFilm: * projection_temp est une vue maintenant, plus une table temporaire
+              la vue fait le produit cartésien directement de room et time_slot
+            * ajout d'un block d'exception
+            
+- RechPlaces: * la pagination est faite
+              * TODO: perenité et popularité sur l'archive
+              

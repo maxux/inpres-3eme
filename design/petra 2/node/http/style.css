@@ -12,7 +12,7 @@ body {
 }
 
 section {
-	width: 500px;
+	width: 620px;
 	margin: auto;
 }
 
@@ -36,7 +36,7 @@ h1 {
 
 .button, .button:visited {
 	display: inline-block;
-	width: 370px;
+	width: 270px;
 	padding: 10px;
 	margin: 10px 0 10px 0;
 	color: #fff;
@@ -82,31 +82,12 @@ span {
 	transition: 0.15s;
 }
 
-#mpd {
-	text-align: center;
+.data {
+	float: left;
+	width: 300px;
+	margin: 0 5px 0 5px;
 }
 
-#mpd .state {
-	position: absolute;
-	margin-top: -25px;
-	z-index: -1;
-	font-size: 80px;
-	color: #282828;
-	width: 500px;
-}
-
-#mpd span {
-	display: block;
-}
-
-#mpd span.artist {
-	color: #1E90FF;
-}
-
-#mpd span.album {
-	color: #FFA500;
-}
-
-#mpd span.title {
-	color: #52AD52;
+.clear {
+	clear: both;
 }

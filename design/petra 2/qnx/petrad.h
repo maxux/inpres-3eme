@@ -11,7 +11,7 @@
 		unsigned int PP :1;
 		unsigned int DE :1;
 		
-	} sensor_t;
+	} __attribute__ ((packed)) sensor_t;
 	
 	typedef struct actuator_t {
 		unsigned CP :2;
@@ -22,10 +22,15 @@
 		unsigned AA :1;
 		unsigned GA :1;
 		
-	} actuator_t;
+	} __attribute__ ((packed)) actuator_t;
 
-	#define SENSORS_FILENAME    "/dev/capteursPETRA"
-	#define ACTUATORS_FILENAME  "/dev/actuateursPETRA"
+	#ifdef __linux__
+		#define SENSORS_FILENAME    "/tmp/petra0"
+		#define ACTUATORS_FILENAME  "/tmp/petra1"
+	#else
+		#define SENSORS_FILENAME    "/dev/capteursPETRA"
+		#define ACTUATORS_FILENAME  "/dev/actuateursPETRA"
+	#endif
 	
 	#define SOCKET_PORT         8788
 	#define SOCKET_LISTEN       "0.0.0.0"

@@ -80,6 +80,12 @@ var RechCI = function(db_file) {
 			args.$genre = '%' + fields.genre + '%';
 		}
 		
+		if(fields.certification != undefined) {
+			var alias = root.tableappend('certification', from, where);
+			where.push(alias + '.key LIKE $certif');
+			args.$certif = '%' + fields.certification + '%';
+		}
+		
 		if(fields.vote_avg_min != undefined || fields.vote_avg_max != undefined) {
 			if(fields.vote_avg_min == undefined || isNaN(parseFloat(fields.vote_avg_min)))
 				fields.vote_avg_min = 0;

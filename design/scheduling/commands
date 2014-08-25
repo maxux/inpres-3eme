@@ -1,0 +1,3 @@
+fs-cifs syna:/root /tmp/syna maxux netsmb
+cd /tmp/syna/tmp/qnx-labo/
+qcc scheduling.c -o scheduling -W -Wall

@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Rennequinepolis - ProgFilms</title>
+	<link rel="stylesheet" href="style/style.css" media="all" type="text/css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript">
+	function dupfound(list) {
+		var sorted = list.sort();
+		
+		for(var i = 0; i < list.length - 1; i++) {
+			if(sorted[i + 1] == sorted[i])
+				return true;
+		}
+		
+		return false;
+	}
+	
+	function parse(json) {
+		for(var i = 0; i < json.length; i++) {
+			var item = json[i];
+			
+			$('.timeslot' + item.TIME_SLOT + ' .room' + item.ROOM).html(
+				item.MOVIE + ' # ' + item.COPY
+			);
+		}
+		
+		for(var i = 1; i <= 4; i++) {
+			var line = [];
+			
+			for(var j = 1; j <= 3; j++) {
+				line[j] = $('.timeslot' + i + ' .room' + j).html();
+			}
+			
+			var color = dupfound(line) ? '#A52A2A' : '#008000';
+			$('.timeslot' + i + ' .valid').css('background-color', color);
+		}
+	}
+	
+	$(document).ready(function() {
+		$.get('/progfilms').done(function(data) {
+			console.log(data);
+			parse(data);
+		});
+	});
+	</script>
+</head>
+
+<body>
+	<table style="width: 500px; margin: auto; border: solid 1px #000000;">
+		<thead>
+			<td>Timeslot</td>
+			<td>Room 1</td>
+			<td>Room 2</td>
+			<td>Room 3</td>
+			<td>Valid</td>
+		</thead>
+		
+		<tr class="timeslot1">
+			<td>10h</td>
+			<td class="room1"></td>
+			<td class="room2"></td>
+			<td class="room3"></td>
+			<td class="valid">&nbsp;</td>
+		</tr>
+		
+		<tr class="timeslot2">
+			<td>14h</td>
+			<td class="room1"></td>
+			<td class="room2"></td>
+			<td class="room3"></td>
+			<td class="valid">&nbsp;</td>
+		</tr>
+		
+		<tr class="timeslot3">
+			<td>18h</td>
+			<td class="room1"></td>
+			<td class="room2"></td>
+			<td class="room3"></td>
+			<td class="valid">&nbsp;</td>
+		</tr>
+		
+		<tr class="timeslot4">
+			<td>22h</td>
+			<td class="room1"></td>
+			<td class="room2"></td>
+			<td class="room3"></td>
+			<td class="valid">&nbsp;</td>
+		</tr>
+	</table>
+</body>
+</html>

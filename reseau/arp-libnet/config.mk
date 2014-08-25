@@ -1,0 +1,8 @@
+EXEC = labo-arp
+
+# flags
+CFLAGS  = -W -Wall -O2 -D_BSD_SOURCE -D__BSD_SOURCE -D__FAVOR_BSD -DHAVE_NET_ETHERNET_H -DLIBNET_LIL_ENDIAN
+LDFLAGS = -lnet
+
+# CC = cc
+

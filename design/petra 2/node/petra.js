@@ -22,10 +22,10 @@ app.listen(8080);
 
 /* root handler on new connection */
 function handler(connection) {
-	var petra_sensors_change = function(value) {
+	var petra_change = function(value) {
 		console.log("[+] Sending update to <" + connection.remoteAddress + ">");
 		connection.sendUTF(JSON.stringify({
-			event: "sensors-change",
+			event: "petra-change",
 			data: value
 		}));
 	};
@@ -43,13 +43,13 @@ function handler(connection) {
 		}
 	};
 	
-	petra.on('sensors-change', petra_sensors_change);
+	petra.on('petra-change', petra_change);
 	connection.on('message', connection_message);
 	
 	// removing each handlers listeners on close
 	connection.on('close', function() {
 		connection.removeAllListeners();	
-		petra.removeListener('sensors-change', petra_sensors_change);
+		petra.removeListener('petra-change', petra_change);
 	});
 }
 

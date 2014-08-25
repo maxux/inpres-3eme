@@ -53,33 +53,26 @@ var PetraServer = function(host, port) {
 		
 		console.log(json);
 		
-		for(var i = 0; i < json.length; i++) 
-			this.sensors[i].value = json[i];
+		for(var i = 0; i < json[0].length; i++) 
+			this.sensors[i].value = json[0][i];
 		
-		this.emit('sensors-change', this.sensors);
+		for(var i = 0; i < json[1].length; i++) 
+			this.actuators[i].value = json[1][i];
+		
+		this.emit('petra-change', [this.sensors, this.actuators]);
 	};
 	
 	this.request = function(object, connection) {
 		// console.log(object);
 		
 		if(object.request == 'status') {
-			console.log('[+] Petra: sensors-status');
-			return this.sensors_status(connection);
-		}
-		
-		if(object.request == 'poweroff') {
-			console.log('[+] Petra: poweroff: ' + object.payload.sensors);
-			return this.sensors_poweroff(object.payload.sensors);
-		}
-		
-		if(object.request == 'poweron') {
-			console.log('[+] Petra: poweron: ' + object.payload.sensors);
-			return this.sensors_poweron(object.payload.sensors);
+			console.log('[+] Petra: status');
+			return this.petra_status(connection);
 		}
 		
 		if(object.request == 'toggle') {
-			console.log('[+] Petra: toggle: ' + object.payload.sensors);
-			return this.sensors_toggle(object.payload.sensors);
+			console.log('[+] Petra: toggle: ' + object.payload.port);
+			return this.actuators_toggle(object.payload.port);
 		}
 		
 		if(object.request == 'ping') {
@@ -90,10 +83,10 @@ var PetraServer = function(host, port) {
 		}
 	};
 	
-	this.sensors_status = function(connection) {
+	this.petra_status = function(connection) {
 		connection.sendUTF(JSON.stringify({
-			event: 'sensors-change',
-			data: this.sensors
+			event: 'petra-change',
+			data: [this.sensors, this.actuators]
 		}));
 	};
 	
@@ -103,26 +96,13 @@ var PetraServer = function(host, port) {
 				return i;
 	}
 	
-	this.actuators_poweroff = function(actuators) {
-		return this.actuators_change(this.actuators_get(actuators), 1);
-	};
-	
-	this.actuators_poweron = function(actuators) {
-		return this.actuators_change(this.actuators_get(actuators), 0);
-	};
-	
 	this.actuators_toggle = function(actuators) {
 		i = this.actuators_get(actuators);
 		return this.actuators_change(i, (this.actuators[i].value) ? 0 : 1);
 	};
 	
-	this.sensors_change = function(index, value) {
-		// fs.writeFile(this.sensors_path(this.sensors[index].id), value);
-				
-		// update local data and notify change
-		this.emit('sensors-change', this.sensors[index]);
-		this.sensors[i].value = value;
-		
+	this.actuators_change = function(index, value) {
+		self.petra.write("SET " + this.actuators[index].code + ' ' + value);		
 		return true;
 	};
 	
@@ -135,7 +115,10 @@ var PetraServer = function(host, port) {
 		// got data from petra
 		//
 		self.petra.on('data', function(data) {
-			self.update(JSON.parse(data.toString()));
+			lines = data.toString().split("\n");
+			
+			for(var i = 0; i < lines.length - 1; i++)
+				self.update(JSON.parse(lines[i]));
 		});
 		
 		self.petra.on('end', function() {
