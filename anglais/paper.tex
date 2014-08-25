@@ -16,7 +16,28 @@
 \date{August 2014}
 
 \begin{document}
-\maketitle
+
+\begin{titlepage}
+\begin{center}
+\textsc{\LARGE Haute Ecole de la Province de Liège}\\[0.5cm]
+\textsc{\Large Catégorie technique}\\[4cm]
+
+% Title
+\huge \bfseries A talk about computer networks \\
+\textsc{\Large by Daniel Maxime, 2326}\\[2cm]
+
+
+
+% Author and supervisor
+\textsc{\large Course: Langue Moderne}
+
+\textsc{\large Lecturer: Véronique Randaxhe}
+
+\vfill
+{\large August 25, 2014}
+
+\end{center}
+\end{titlepage}
 \newpage
 
 \tableofcontents
@@ -41,6 +62,7 @@
 
 
 \section{Introduction}
+
 	\subsection{Computers network}
 	
 	Computers that we all know are useful for a lot of things: managing works, computing for science research,
@@ -50,7 +72,7 @@
 	is on the other side of the Earth, that's just beautiful.
 	
 	The computer networks have undergone major changes over time. Multiple projects came out and
-	only some of them (a single one in fact) survived. Let's see how it works...
+	only some of them survived. Let's see how it works...
 	
 	\subsection{A brief history}
 	
@@ -71,11 +93,11 @@
 
 \section{Network layers}
 
-	The mot important part of the network base is the "OSI model" (Open Systems Interconnection model) which characterizes and
+	The most important part of the network base is the "OSI model" (Open Systems Interconnection model) which characterizes and
 	standardizes the internal functions of a communication system. All "Internet" networks use it. This model splits
 	the work in 7 layers, each independant from one another. You can changer a layer without affecting the content
 	of the others. It's due to this method that you can browse the web on wireless or wired connection without changing
-	all your hardware.
+	all your hardware/software.
 	
 	Let me explain these layers from the bottom to the top, to understand how each small protocol used on the Internet
 	works with the others to provide a full and flexible support. After that, we will see how these protocols interact
@@ -95,13 +117,13 @@
 	
 	This (single) layer enables devices to communicate together on a small area (eg: devices you have at your house,
 	nothing more). The most common protocol used at this layer is Ethernet. This protocol is made to transmit data
-	over the layer 1, with some collisions and errors detection. After that, to connect two devices between them, you
+	over the layer 1, with some errors detection. After that, to connect two devices between them, you
 	need to use addresses. Ethernet use MAC addresses.
 	\footnote{No, you don't need to have an "Apple Mac Computer" to have a MAC address.
 	All physical ethernet network cards have got a unique one on the world.}
-	\footnote{Exemple of MAC address: 00:54:77:65:78:21}
-	A MAC address is 48 bits longs, that means that there are about 281,000 billion addresses possible. I think that's
-	enough for your home (yes, remember, this protocol connects only a small area).
+	A MAC address is 48 bits longs\footnote{Exemple of MAC address: 00:54:77:65:78:21},
+	that means that there are about 281,000 billion addresses possible. I think that's enough for
+	your home (yes, remember, this protocol connects only a small area).
 	
 	This protocol, like all protocols (you will see later) uses a generic data representation:
 	header + payload (+ footer).
@@ -128,14 +150,14 @@
 	which is really used to have "Internet".
 	
 	Nice, but, what exactly is IP ? IP is the protocol which enables to make the link with the underlying layer
-	and global mapped address. IP uses... IP addresses.
+	and global mapped address. IP uses... IP addresses
 	\footnote{Exemple of IP address: 82.212.175.9} to represents source and destination. With the fourth version of the protocol
 	(commonly called IPv4), addresses are 32 bits long, which makes about 4 billions unique addresses. At the beginning of
 	the "Internet time", this was absolutely huge.
 	
 	One more time, we will encapsulate this protocol on the underlying protocol. We have this schema right now:
 	\begin{center}
-	\includegraphics[scale=0.3]{content/layer3.eps}
+	\includegraphics[scale=0.35]{content/layer3.eps}
 	\end{center}
 	
 	We can now contact devices outside our home. We will see later how and why it's only now that we can contact
@@ -147,18 +169,17 @@
 	To understand a little bit more how that works, I'll draw an analogy with real life. Imagine a world with
 	roads and a lot of buildings with flats. Roads are the layer 1 (wire), your car is the layer 2 (Ethernet), the building
 	address, flat stage and flat number are described by the IP address. Now you are at your destination, you want to
-	go to a specific location on this flat. When your enter the flat, you are in the lobby, you have multiple doors
+	go to a specific location on this flat. When you enter the flat, you are in the lobby, you have multiple doors
 	in front of you. That's the solution. Behind each doors you have one service.
 	
 	These doors on network are called "ports".
 	
 	This happen on layer 4 with multiple possible protocols. The most used are TCP and UDP. They are both the same purpose
 	and differents ports, but work in two different ways, these ways are not important to understand how it works.
-	ss
 	Just keep in mind that these ports enable you to access specific services on the remote device. Like each time,
 	this works with encapsulation. That's what we have after this encapsulation:
 	\begin{center}
-	\includegraphics[scale=0.3]{content/layer4.eps}
+	\includegraphics[scale=0.35]{content/layer4.eps}
 	\end{center}
 	
 	Like before, the header contains the source port and the destination port. Yes, you have a source port. In fact,
@@ -175,20 +196,22 @@
 	Well, what is the layer 7 ? It's simply data you want to exchange. You can send "hello" (really just "hello"),
 	and that's what the remote service (remember, the door) will receive. That's easy but to request a web page for example,
 	we must provide a comprehensive way to talk with the web server. To perform that correctly, we use... one more time,
-	protocols ! At this layer, we find a lot of protocols: http, ftp, ssh, irc, telnet, smtp, pop3, imap, ...
+	protocols ! At this layer, we find a lot of protocols: http (for web pages), ftp (for file sharing),
+	ssh (remote console), irc (chat), telnet (remote console), smtp (sending mail), pop3 and imap (mail storage), ...
 	
 	Each of these protocols has a default port number. The exact content of the protocol is described on each RFC
 	specially written for that.
 	
 	Now, our complete frame looks like that:
 	\begin{center}
-	\includegraphics[scale=0.3]{content/layer7.eps}
+	\includegraphics[scale=0.35]{content/layer7.eps}
 	\end{center}
 	
 	That's nice, but why do we need all of these protocols to reach the wanted destination, and why do we split them?
 	To understand that, we must go deeper in the description.
 
 \section{A little deeper...}
+
 	You have (I hope) the schema with building, flats and roads on your mind. Keep it fresh, I'll complete it to 
 	understand well some devices and specific additionnal services you can find on networks.
 	
@@ -213,10 +236,11 @@
 	trying to access some services. If this security agent sees someone unauthorized, he will simply throw them out.
 	This security agent is called "firewall".
 	
-	That's all folks ! You now know basically how a computer network works. Pretty simple, right ? That's how it works
+	That's all folks ! You now know (basically) how a computer network works. Pretty simple, right ? That's how it works
 	nowadays, but computer science is a science which progresses everyday and the futur is already considered.
 
 \section{What's next ?}
+
 	Remember, I explained to you the layer 3 with the fourth version of "IP" (IPv4). Nowadays, IPv6 exists. In fact, the
 	IPv4's 32 bits long addresses are too short now. We'll reach the limit of existing addresses very soon, that's the
 	main reason for IPv6 to exists. The main new thing that IPv6 improves is that the addresses are no more on 32 bits,
@@ -229,12 +253,61 @@
 	that HTTP, TCP and Ethernet still work the same way on IPv4 or IPv6. That's so beautiful !
 	
 	Finally, if you've heard of IPv8, IPv9 or something like that, forget it, they simply don't exist.
-	\newpage
 
 \section{Conclusion}
+
 	You now know how computers networks (Internet mainly) works, with which protocols and how they communicate with each other.
 	Your network card contains a MAC address used by IP to go outside your house. You have ports which specify the service
 	and the application protocol which contains your requests for specific services.
+	
+	\newpage
+	
+\section{Glossary}
+	
+	\begin{itemize}
+		\itemsep0em
+		\item \textbf{Protocols}:
+			specific method used to describe the mechanism, the fields of data, bits, bytes,
+			the order of operations and data to send and receive to make a working-communication.
+			
+		\item \textbf{Internet Provider}: 
+			companies interconnected with other companies which enables you to reach different networks.
+			All of these different networks make "the Internet", it's simply a lot of interconnected-networks.
+			
+		\item \textbf{Checksum}: 
+			a fast operation which consist of make the sum of the data with an algorythm more or less secure.
+			This mechanism enables protocol to know if the payload is altered or not by doing the same operation
+			and comparing the checksum value. Safer is the checksum, longer and slower it is.
+			
+		\item \textbf{Data encapsulation}: 
+			the fact of put data on a larger container.
+			
+		\item \textbf{Response mechanism}: 
+			when you receive data, you can response to it just by fill in the application payload
+			with your response, then swaping source and destination address on headers.
+			
+		\item \textbf{Subnet}: 
+			each IP contained on the same subnets can communicate each other without router, a router
+			is the device that enables communication between multiple subnets.
+			
+		\item \textbf{TCP}: 
+			protocol which enables "secure" connection with a negociation (handshake) before working. It provides
+			an acknowledgment and retransmission light but optimized system.
+			
+		\item \textbf{UDP}: 
+			protocol less "secure" than TCP because it does not support retransmission, acknowledgment and handshake,
+			but is very smaller than TCP. This protocol is often used for multimedia content streaming.
+			
+		\item \textbf{Switch}: 
+			devices that works on layer 2 only and forward frame on the right (destination address) physical port.
+			
+		\item \textbf{Router}: 
+			interconnect multiple subnet and take decision for routing (best path, etc.)
+			
+		\item \textbf{Firewall}: 
+			security software which analyze traffic and take decision based on users rules.
+		
+	\end{itemize}
 	
 	\newpage
 
@@ -247,6 +320,7 @@
 		\item https://en.wikipedia.org/wiki/ARCnet
 		\item https://en.wikipedia.org/wiki/TokenRing
 		\item https://en.wikipedia.org/wiki/OSI\_model
+		\item http://www.cisco.com/c/en/us/support/docs/ip/routing-information-protocol-rip/13769-5.html
 		\item Graphics are made using https://draw.io
 	\end{itemize}
 	
