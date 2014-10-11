@@ -1,0 +1,166 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Petra Remote Sequencer</title>
+	<link rel="stylesheet" href="style.css" media="all" type="text/css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="petraremote.js"></script>
+	<script type="text/javascript" src="parser.js"></script>
+	<script type="text/javascript">
+	var petraremote;
+	var parse = null;
+	
+	function parsing() {
+		parse = new Parser(document.getElementById('data').value, petraremote);
+	}
+	
+	function stop() {
+		if(parse)
+			parse.stop();
+	}
+	
+	function pick() {
+		var value = document.getElementById('preselect').value;
+		document.getElementById('data').value = document.getElementById(value).innerHTML;
+	}
+	
+	$(document).ready(function() {
+		petraremote = new PetraRemote();
+	});
+	</script>
+</head>
+
+<body>
+	<section>
+		<h1>Information</h1>
+		<div id="status" style="margin-bottom: 30px;">
+			Connexion au serveur en cours
+		</div>
+		
+		<div>
+			<textarea id="data" style="width: 100%; height: 300px;"></textarea>
+			<button onclick="parsing();">Run</button>
+			<button onclick="stop();">Stop</button>
+			<select onchange="pick();" id="preselect">
+				<option value="empty">(vide)</option>
+				<option value="run1">Test 1</option>
+				<option value="run2">Test 2</option>
+				<option value="run3">Test 3</option>
+				<option value="run4">Test 4</option>
+				<option value="run5">Test 5</option>
+			</select>
+		</div>
+		
+<pre>
+L1 = Cut-Out #1          L2 = Cut-Out #2      | $xx       -> petra variable xx
+T  = Epaisseur           S  = Slot            | if        -> _var_ == _var_ label
+CS = Chariot Stable      AP = Bras            | xx:       -> define label position
+PP = Plongeur            DE = Bac d'entrée    | write     -> $var _value_
+----------------------------------------------| _x_ =     -> local variable assignation
+CP = Position chariot    C1 = Tapis 1         | interrupt -> label interruption
+C2 = Tapis 2             PV = Ventouse        | detach    -> wait for async
+PA = Plongeur            AA = Bras            |
+GA = Grappin                                  |
+</pre>
+	</section>
+
+<div id="run1">
+#
+# Test 1
+# Active ou désactive le tapis en fonction de l'état du slot
+#
+
+main:
+sleep 100
+x = $S
+if x == 1 enable_tapis
+write $C1 0
+call main
+
+enable_tapis:
+write $C1 1
+call main
+</div>
+
+<div id="run2">
+#
+# Test 2
+# Active ou désactive le tapis en fonction de l'état du slot
+# Utilise le cache d'état en plus
+#
+
+main:
+sleep 500
+if $S == 1 test_cache_enable
+if $C1 == 1 disable_tapis
+call main
+
+test_cache_enable:
+if $C1 == 0 enable_tapis
+call main
+
+enable_tapis:
+write $C1 1
+call main
+
+disable_tapis:
+write $C1 0
+call main
+</div>
+
+<div id="run3">
+#
+# Test 3
+# Active ou désactive le tapis en fonction de l'état du slot
+# Utilise une interruption et un cache
+#
+
+interrupt intr
+detach
+
+intr:
+if $S == 1 test_cache_enable
+if $C1 == 1 disable_tapis
+detach
+
+test_cache_enable:
+if $C1 == 0 enable_tapis
+detach
+
+enable_tapis:
+write $C1 1
+detach
+
+disable_tapis:
+write $C1 0
+detach
+</div>
+
+<div id="run4">
+#
+# Test 4
+# Descend le plongeur et active la ventouse puis remonte le plongeur
+# Quitte une fois l'opération terminé
+#
+
+main:
+write $PA 0
+sleep 3000
+write $PV 1
+sleep 1000
+write $PA 1
+</div>
+
+<div id="run5">
+#
+# Test 5
+# 
+#
+
+
+</div>
+
+<div id="empty"></div>
+
+</body>
+</html>

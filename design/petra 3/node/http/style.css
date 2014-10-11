@@ -1,0 +1,97 @@
+* {
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+body {
+	background-color: #1A1A1A;
+	color: #E5E5E5;
+	font-family: "Trebuchet MS";
+}
+
+section {
+	width: 620px;
+	margin: auto;
+}
+
+h1 {
+	border-bottom: solid 1px #BFBFBF;
+	padding-left: 15px;
+	margin: 20px 0 10px 0;
+}
+
+.success {
+	color: #00A300;
+}
+
+.error {
+	color: #C51515;
+}
+
+#gpio {
+	text-align: center;
+}
+
+.button, .button:visited {
+	display: inline-block;
+	width: 270px;
+	padding: 10px;
+	margin: 10px 0 10px 0;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 6px;
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	position: relative;
+	cursor: pointer
+	font-size: 34px;
+	text-align: center;
+	cursor: hand;
+	font-weight: bold;
+}
+
+.on.button, .on.button:visited {
+	background-color: #91BD09;
+}
+
+.on.button:hover {
+	background-color: #749A02;
+}
+
+.off.button, .off.button:visited {
+	background-color: #E62727;
+}
+
+.off.button:hover {
+	background-color: #CF2525;
+}
+
+.disabled.button {
+	background-color: #4D4D4D;
+}
+
+#status {
+	width: 100%;
+	text-align: center;
+	transition: 1s;
+}
+
+span {
+	transition: 0.15s;
+}
+
+.data {
+	float: left;
+	width: 300px;
+	margin: 0 5px 0 5px;
+}
+
+.clear {
+	clear: both;
+}
+
+#run1, #run2, #run3, #run4, #run5 {
+	display: none;
+}
