@@ -50,7 +50,7 @@ var Parser = function(input, remote) {
 			if('$' + data[1][i].code == id)
 				return data[1][i].value;
 		
-		console.log("[-] unknown identifier: " + id);		
+		console.log("[-] unknown identifier: " + id);
 		return 0;
 	}
 	
@@ -86,6 +86,44 @@ var Parser = function(input, remote) {
 	}
 	
 	//
+	// if's
+	//
+	function if_equals(a1, a2, label) {
+		if(a1 == a2)
+			return running('call ' + label);
+		
+		return true;
+	}
+	
+	function if_notequals(a1, a2, label) {
+		if(a1 != a2)
+			return running('call ' + label);
+		
+		return true;
+	}
+	
+	function if_gt(a1, a2, label) {
+		if(a1 > a2)
+			return running('call ' + label);
+		
+		return true;
+	}
+	
+	function if_lt(a1, a2, label) {
+		if(a1 < a2)
+			return running('call ' + label);
+		
+		return true;
+	}
+	
+	function if_modulo(a1, a2, label) {
+		if(a1 % a2)
+			return running('call ' + label);
+		
+		return true;
+	}
+	
+	//
 	// parser
 	//
 	function running(line) {		
@@ -97,7 +135,7 @@ var Parser = function(input, remote) {
 		
 		switch(words[0]) {			
 			case 'write':
-				console.log("[+] writing:" + words[1] + ", " + parseInt(words[2]));
+				console.log("[+] writing: " + words[1] + ", " + parseInt(words[2]));
 				
 				var _port = words[1].replace('$', '');
 				remote.write('write', {port: _port, value: parseInt(words[2])});
@@ -105,7 +143,7 @@ var Parser = function(input, remote) {
 			break;
 			
 			case 'sleep':
-				console.log("[+] sleeping " + words[1] + "ms");
+				console.log("[+] sleeping: " + words[1] + "ms");
 				next(parseInt(words[1]));
 				return false;
 			break;
@@ -124,21 +162,34 @@ var Parser = function(input, remote) {
 			break;
 			
 			case 'if':
-				if(words[2] != '==') {
-					console.log("[-] unknown statement: " + words[2]);
-					return true;
-				}
-				
 				var a1 = gets(words[1]);
 				var a2 = gets(words[3]);
 				
-				debug("[+] checking: " + a1 + " == " + a2);
-				
-				// if match, call label
-				if(a1 == a2)
-					return running('call ' + words[4]);
-				
-				return true;
+				switch(words[2]) {
+					case '==':
+						return if_equals(a1, a2, words[4]);
+					break;
+					
+					case '!=':
+						return if_notequals(a1, a2, words[4]);
+					break;
+					
+					case '>':
+						return if_gt(a1, a2, words[4]);
+					break;
+					
+					case '<':
+						return if_lt(a1, a2, words[4]);
+					break;
+					
+					case '%':
+						return if_modulo(a1, a2, words[4]);
+					break;
+					
+					default:
+						console.log("[-] unknown statement: " + words[2]);
+						return true;
+				}
 			break;
 			
 			case 'interrupt':
@@ -160,7 +211,13 @@ var Parser = function(input, remote) {
 		switch(words[1]) {
 			// variable assignation
 			case '=':
-				vars[words[0]] = getvalue(words[2]);
+				vars[words[0]] = gets(words[2]);
+				debug(vars);
+				return true;
+			break;
+			
+			case '+=':
+				vars[words[0]] = vars[words[0]] + gets(words[2]);
 				debug(vars);
 				return true;
 			break;

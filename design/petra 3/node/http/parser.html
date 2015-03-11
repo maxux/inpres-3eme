@@ -21,7 +21,19 @@
 	
 	function pick() {
 		var value = document.getElementById('preselect').value;
-		document.getElementById('data').value = document.getElementById(value).innerHTML;
+		document.getElementById('data').value = htmldecode(document.getElementById(value).innerHTML);
+	}
+	
+	function htmldecode(text) {
+		var entities = [
+			['lt', '<'],
+			['gt', '>']
+		];
+
+		for (var i = 0, max = entities.length; i < max; ++i) 
+			text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
+
+		return text;
 	}
 	
 	$(document).ready(function() {
@@ -154,10 +166,41 @@ write $PA 1
 <div id="run5">
 #
 # Test 5
-# 
+# Test de boucle/alternative
 #
 
+# for i = 0; i lt 10; i++
+i = 0
 
+for_loop:
+if i == 10 end
+if i > 8 tapis1_enable
+if i > 5 tapis2_enable
+if i != 3 grappin_enable
+call ventouse_enable
+
+tapis1_enable:
+write $C1 1
+call end_for
+
+tapis2_enable:
+write $C2 1
+call end_for
+
+grappin_enable:
+write $GA 1
+call end_for
+
+ventouse_enable:
+write $PV 1
+call end_for
+
+end_for:
+i += 1
+sleep 800
+call for_loop
+
+end:
 </div>
 
 <div id="empty"></div>
